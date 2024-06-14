@@ -1,0 +1,124 @@
+style {
+    background-color: gray;
+}
+
+.custom-footer {
+    padding: 20px 0; /* Ajusta el padding según tus necesidades */
+    margin-top: 30px; /* Ajusta el margen top según tus necesidades */
+    background-color: #f8f9fa; /* Color de fondo opcional */
+}
+
+.input-group-text{
+    border-color: #1f1c18;
+    background-color: #1f1c18;
+    color: white;
+    font-size: small;
+    height: 35px;
+}
+
+.form-control, .custom-select {
+    border-color: #1f1c18;
+    font-size: small;
+    height: 35px;
+}
+
+.btn-outline-purple {
+    border-color: #352b1e;
+    background-color: #352b1e;
+    color: white;
+}
+
+.btn-outline-purple:hover {
+    border-color: #1f1c18;
+    background-color: white;
+    color: #352b1e;
+}
+
+.btn-outline-purple:focus {
+    border-color: #1f1c18;
+    background-color: white;
+    color: #1f1c18;
+}
+
+.btn-outline-grey {
+    border-color: #96968c;
+    background-color: white;
+    color: #96968c;
+}
+
+.btn-outline-grey:hover {
+    border-color: #96968c;
+    background-color: #96968c;
+    color: white;
+}
+
+.btn-outline-red {
+    border-color: #c90101;
+    background-color: #c90101;
+    color: white;
+}
+
+.btn-outline-red:hover {
+    border-color: #c90101;
+    background-color: white;
+    color: #c90101;
+}
+
+.btn-outline-red:focus {
+    border-color: #9f0000;
+    background-color: white;
+    color: #9f0000;
+}
+
+.border-light-grey {
+    border-color: #e6e6dc;
+}
+
+.border-grey {
+    border-color: #96968c;
+}
+
+.border-purple {
+    border-color: #1f1c18;
+}
+
+.font-small {
+    font-size: small;
+}
+
+.col-results {
+    padding-top: 5px;
+}
+
+.bg-grey-light {
+    background-color: #e6e6dc;
+}
+
+.bg-purple {
+    background-color: #1f1c18;
+    color: white;
+}
+
+.bg-purple-md {
+    background-color: #352b1e;
+    color: white;
+}
+
+.card {
+    font-size: small;
+    padding: 5px 5px 5px 5px;
+}
+
+.row-results-input{
+    padding-top: 5px;
+}
+
+.table-positions table,
+.table-positions th,
+.table-positions td {
+    border: 0.01cm;
+    border-color: #1f1c18;
+    border-style: solid;
+    border-collapse: collapse;
+    padding: 10px;
+}

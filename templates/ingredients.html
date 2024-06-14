@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Ingredientes</h1>
+    <form method="post" action="{{ url_for('update_prices') }}">
+        <ul class="list-group" id="ingredients-list">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <h3>Ingrediente</h3>
+                </div>
+                <div>
+                    <h3>Precio/Unidad</h3>
+                </div>
+                <div></div>
+            </li>
+            {% for item in ingredients %}
+            <li class="list-group-item d-flex justify-content-between align-items-center" id="ingredient-{{ loop.index }}">
+                <div class="ingredient-name flex-grow-1">
+                    <input type="text" class="form-control" name="nombres[]" value="{{ item.Nombre }}" required>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="form-group mb-2 mr-2">
+                        <label for="precio-{{ loop.index }}" class="sr-only">Precio</label>
+                        <input type="number" step="0.01" class="form-control" id="precio-{{ loop.index }}" name="precios[]" placeholder="Precio" value="{{ item.Precio }}" required>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="unidad-{{ loop.index }}" class="sr-only">Unidad</label>
+                        <select class="form-control" id="unidad-{{ loop.index }}" name="unidades[]" required>
+                            <option value="kilogramo" {% if item.Unidad == 'kilogramo' %} selected {% endif %}>Kilogramo</option>
+                            <option value="litro" {% if item.Unidad == 'litro' %} selected {% endif %}>Litro</option>
+                            <option value="unidad" {% if item.Unidad == 'unidad' %} selected {% endif %}>Unidad</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-danger btn-sm remove-ingredient-btn" data-index="{{ loop.index }}">Eliminar</button>
+            </li>
+            {% endfor %}
+        </ul>
+        <div class="d-flex justify-content-center mt-3">
+            <button type="button" class="btn btn-success mt-3" id="add-ingredient-btn">Agregar</button>
+        </div>
+        <div class="d-flex justify-content-center mt-3">
+            <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+        </div>
+        
+    </form>
+</div>
+
+<script>
+document.getElementById('add-ingredient-btn').addEventListener('click', function() {
+    var ingredientsList = document.getElementById('ingredients-list');
+    var newIndex = ingredientsList.children.length;  // Adjust for header row
+
+    var newIngredient = document.createElement('li');
+    newIngredient.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+    newIngredient.setAttribute('id', 'ingredient-' + newIndex);
+
+    var nameInput = document.createElement('input');
+    nameInput.setAttribute('type', 'text');
+    nameInput.classList.add('form-control', 'ingredient-name-input');  // Agregar una clase específica
+    nameInput.setAttribute('name', 'nombres[]');
+    nameInput.setAttribute('placeholder', 'Nombre del ingrediente');  // Placeholder opcional
+    nameInput.required = true;
+    newIngredient.appendChild(nameInput);
+
+    var priceInput = document.createElement('input');
+    priceInput.setAttribute('type', 'number');
+    priceInput.setAttribute('step', '0.01');
+    priceInput.classList.add('form-control', 'ingredient-price-input');  // Agregar una clase específica
+    priceInput.setAttribute('name', 'precios[]');
+    priceInput.setAttribute('placeholder', 'Precio');
+    priceInput.required = true;
+    newIngredient.appendChild(priceInput);
+
+    var unitSelect = document.createElement('select');
+    unitSelect.classList.add('form-control', 'ingredient-unit-select');  // Agregar una clase específica
+    unitSelect.setAttribute('name', 'unidades[]');
+    unitSelect.required = true;
+    var optionKilogramo = new Option('Kilogramo', 'kilogramo');
+    var optionLitro = new Option('Litro', 'litro');
+    var optionUnidad = new Option('Unidad', 'unidad');
+    unitSelect.add(optionKilogramo);
+    unitSelect.add(optionLitro);
+    unitSelect.add(optionUnidad);
+    newIngredient.appendChild(unitSelect);
+
+    var removeButton = document.createElement('button');
+    removeButton.setAttribute('type', 'button');
+    removeButton.classList.add('btn', 'btn-danger', 'btn-sm', 'remove-ingredient-btn');
+    removeButton.setAttribute('data-index', newIndex);
+    removeButton.textContent = 'Eliminar';
+    newIngredient.appendChild(removeButton);
+
+    ingredientsList.appendChild(newIngredient);
+
+    // Add event listener for the new remove button
+    removeButton.addEventListener('click', function() {
+        var index = this.getAttribute('data-index');
+        var ingredientElement = document.getElementById('ingredient-' + index);
+        ingredientsList.removeChild(ingredientElement);
+    });
+});
+
+// Add event listeners for existing remove buttons
+document.querySelectorAll('.remove-ingredient-btn').forEach(function(button) {
+    button.addEventListener('click', function() {
+        var index = this.getAttribute('data-index');
+        var ingredientElement = document.getElementById('ingredient-' + index);
+        ingredientElement.parentNode.removeChild(ingredientElement);
+    });
+});
+</script>
+{% endblock %}

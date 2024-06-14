@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-md-11">
+                <h1>Aurora Café</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for product in products %}
+            <div class="col-md-4">
+                <div class="card mb-2" style="border: hidden;">
+                    <img class="card-img-top" src="/static/media/products/{{ product }}.jpg" style="border: 1px solid #e6e6dc;">
+                    <div class="card-body">
+                        <a href="product/{{ product }}" class="btn btn-outline-purple btn-block">{{ product }}</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}

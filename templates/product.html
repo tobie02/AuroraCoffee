@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+    <form action="{{ url_for('update_ingredients') }}" method="post">
+        <div class="row mt-5">
+            <div class="col-md-11">
+                <div class="input-group input-group-sm mb-1">
+                    <img class="border" src="/static/media/products/{{ product }}.jpg" height="50" style="align-content: center;">
+                    <h1 style="padding-left: 5px;">{{ product }}</h1>
+                    <input type="hidden" name="product_name" id="product_name" value="{{ product }}">
+                </div>
+                <div>
+                    <ul id="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <h3>Ingrediente</h3>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <h3>Cantidad</h3>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <h3></h3>
+                            </div>
+                        </li>
+                        {% for ingredient, quantity in ingredients.items() %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center" id="ingredient_{{ loop.index0 }}">
+                            <div class="d-flex align-items-center">
+                                <input type="text" class="form-control ingredient-name" id="ingredient_{{ loop.index0 }}_ingredient" name="ingredients[]" value="{{ ingredient }}" required>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <input type="number" class="form-control quantity-input" id="ingredient_{{ loop.index0 }}_quantity" name="quantities[]" value="{{ quantity }}" required>
+                                <label for="ingredient_{{ loop.index0 }}_quantity" class="quantity-label">(g/ml/cant)</label>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-danger btn-sm remove-ingredient-btn" data-index="{{ loop.index0 }}">Eliminar</button>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="d-flex justify-content-center mt-3">
+                        <button type="button" class="btn btn-success mt-3" id="add-ingredient-btn">Agregar</button>
+                    </div>
+                    <div class="d-flex justify-content-center mt-3">
+                        <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('add-ingredient-btn').addEventListener('click', function() {
+    var ingredientsList = document.getElementById('list-group');
+    var newIndex = ingredientsList.children.length - 1;  // Adjust for header row
+
+    var newIngredient = document.createElement('li');
+    newIngredient.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+    newIngredient.setAttribute('id', 'ingredient_' + newIndex);
+
+    var nameInput = document.createElement('input');
+    nameInput.setAttribute('type', 'text');
+    nameInput.setAttribute('class', 'form-control ingredient-name');
+    nameInput.setAttribute('id', 'ingredient_' + newIndex + '_ingredient');
+    nameInput.setAttribute('name', 'ingredients[]');
+    nameInput.setAttribute('required', true);
+    newIngredient.appendChild(nameInput);
+
+    var quantityInput = document.createElement('input');
+    quantityInput.setAttribute('type', 'number');
+    quantityInput.setAttribute('class', 'form-control quantity-input');
+    quantityInput.setAttribute('id', 'ingredient_' + newIndex + '_quantity');
+    quantityInput.setAttribute('name', 'quantities[]');
+    quantityInput.setAttribute('required', true);
+    newIngredient.appendChild(quantityInput);
+
+    var quantityLabel = document.createElement('label');
+    quantityLabel.setAttribute('for', 'ingredient_' + newIndex + '_quantity');
+    quantityLabel.classList.add('quantity-label');
+    quantityLabel.textContent = '(g/ml/cant)';
+    newIngredient.appendChild(quantityLabel);
+
+    var removeButton = document.createElement('button');
+    removeButton.setAttribute('type', 'button');
+    removeButton.classList.add('btn', 'btn-danger', 'btn-sm', 'remove-ingredient-btn');
+    removeButton.setAttribute('data-index', newIndex);
+    removeButton.textContent = 'Eliminar';
+    newIngredient.appendChild(removeButton);
+
+    ingredientsList.appendChild(newIngredient);
+
+    // Add event listener for the new remove button
+    removeButton.addEventListener('click', function() {
+        var index = this.getAttribute('data-index');
+        var ingredientElement = document.getElementById('ingredient_' + index);
+        ingredientsList.removeChild(ingredientElement);
+    });
+});
+
+// Add event listeners for existing remove buttons
+document.querySelectorAll('.remove-ingredient-btn').forEach(function(button) {
+    button.addEventListener('click', function() {
+        var index = this.getAttribute('data-index');
+        var ingredientElement = document.getElementById('ingredient_' + index);
+        ingredientElement.parentNode.removeChild(ingredientElement);
+    });
+});
+</script>
+{% endblock %}
