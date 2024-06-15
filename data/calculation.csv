@@ -1,8 +1,10 @@
 Producto,Precio crudo,Precio final
 Cafe Chico,1080.0,1404.0
-Cappuccino,5185.0,6740.5
+Cappuccino,1522.75,1979.58
 Medialuna,2341.0,3043.3
 Cookies,187.0,243.1
-Lemon Pie,1978.0,2571.4
-La Marquese,30000.0,39000.0
+Lemon Pie,2478.0,3221.4
+La Marquese,4500.0,5850.0
 Cheesecake,0.0,0.0
+"{'Producto': 'Lemon Pie', 'Precio crudo': 2478.0, 'Precio final': 3221.4}",3478.0,4521.4
+"{'Producto': 'Cappuccino', 'Precio crudo': 1522.75, 'Precio final': 1979.58}",1358.5,1766.05
