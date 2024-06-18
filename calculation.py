@@ -51,11 +51,11 @@ def calculate_graphs():
     plt.title('Ventas por Mes')
     plt.xticks(rotation=45)
 
-    path = 'static/ventas.png'
+    path = 'static/temp/ventas.png'
     plt.savefig(path)
     plt.close()
 
-    months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+    months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
     expenses = [300, 300, 320, 330, 340, 330, 330, 340, 310, 300, 290, 320]
     profits = [250, 240, 260, 270, 300, 340, 370, 380, 420, 430, 440, 460]
 
@@ -65,10 +65,10 @@ def calculate_graphs():
     plt.xlabel('Mes')
     plt.ylabel('Cantidad')
     plt.title('Gastos y Ganancias')
-    plt.legend()
+    plt.legend()    
     plt.xticks(rotation=45)
 
-    path = 'static/ventas_gastos.png'
+    path = 'static/temp/ventas_gastos.png'
     plt.savefig(path)
     plt.close()
 

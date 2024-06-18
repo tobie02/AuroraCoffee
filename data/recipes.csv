@@ -1,17 +1,17 @@
-,Cafe Chico,Cappuccino,Medialuna,Cookies,Lemon Pie,La Marquese,Cheesecake,"{'Producto': 'Lemon Pie', 'Precio crudo': 2478.0, 'Precio final': 3221.4}","{'Producto': 'Cappuccino', 'Precio crudo': 1522.75, 'Precio final': 1979.58}"
-Cafe,100.0,100.0,,,,,,,100.0
-Azucar,100.0,100.0,100.0,,130.0,,,130.0,100.0
-Cacao,,50.0,,,,,,,30.0
-Leche,,150.0,,,,,,,100.0
-Harina,,,300.0,100.0,200.0,,,200.0,
-Huevos,,,2.0,,4.0,,,4.0,
-Almibar,,,100.0,,,,,,
-Limon,,,,,150.0,,,150.0,
-Manteca,,,200.0,,200.0,200.0,,300.0,
-Tu vieja,,,,,,,,,
-Chocolate,,,,50.0,,300.0,,,
-polvo de hornear,,,,,5.0,,,5.0,
-Crema,,,,,,300.0,,,
-Dulce de leche,,,,,,300.0,,,
-Frutilla,,,,,,200.0,,,
-manteca,,,,,,,,,
+,Cafe Chico,Cappuccino,Medialuna,Cookies,Lemon Pie,La Marquese,Cheesecake
+Cafe,100.0,100.0,,,,,
+Azucar,100.0,100.0,100.0,,130.0,,
+Cacao,,50.0,,,,,
+Leche,,150.0,,,,,
+Harina,,,300.0,100.0,200.0,,
+Huevos,,,2.0,,4.0,,
+Almibar,,,100.0,,,,
+Limon,,,,,150.0,,
+Manteca,,,200.0,,200.0,200.0,
+Tu vieja,,,,,,,
+Chocolate,,,,50.0,,300.0,
+polvo de hornear,,,,,5.0,,
+Crema,,,,,,300.0,
+Dulce de leche,,,,,,300.0,
+Frutilla,,,,,,200.0,
+manteca,,,,,,,

@@ -10,8 +10,17 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
-
     <title>Aurora Café</title>
+    <style>
+      .back-button {
+        font-size: 1.5rem;
+        color: #6c757d;
+        cursor: pointer;
+      }
+      .back-button:hover {
+        color: #343a40;
+      }
+    </style>
   </head>
   <body onload="modalLoad()">
 
@@ -63,6 +72,13 @@
             </ul>
         </div>
     </nav>
+    <nav class="navbar navbar-expand-lg navbar-light navbar-expand">
+        <!-- Back Button -->
+            <div class="img-fluid w-100">
+                <i class="fas fa-chevron-left back-button" onclick="window.history.back()"></i>
+            </div>
+        </div>
+    </nav>
     
 
     {% with messages = get_flashed_messages() %}
@@ -94,8 +110,6 @@
         <span>Aurora Software</span>
         </div>
     </footer>
-
-       
 
   </body>
 </html>
