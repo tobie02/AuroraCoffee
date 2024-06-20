@@ -5,8 +5,8 @@ import subprocess
 import gdown
 
 # URLs del servidor de actualizaciones en Google Drive
-VERSION_FILE_ID = ""
-INSTALLER_FILE_ID = ""
+VERSION_FILE_ID = "18lvUlm3Et8sCnJHsGo19gcAciBd4uFqy"
+INSTALLER_FILE_ID = "1WaXJeliya4Ld-XEMgj8jXnu3xV-_nb-v"
 
 VERSION_URL = f"https://drive.google.com/uc?export=download&id={VERSION_FILE_ID}"
 INSTALLER_URL = f"https://drive.google.com/uc?export=download&id={INSTALLER_FILE_ID}"

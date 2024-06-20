@@ -122,3 +122,16 @@ style {
     border-collapse: collapse;
     padding: 10px;
 }
+
+.h1-like {
+    font-size: 2rem; /* Tamaño de fuente similar a h1 */
+    font-weight: bold; /* Peso de fuente negrita */
+    border: none; /* Elimina el borde del input */
+    padding: .375rem .75rem; /* Añade un poco de espacio interno */
+}
+
+#add-product-btn {
+    font-size: 2rem;
+    height: 100px; /* Ajusta la altura según sea necesario */
+    width: 100px; /* Ajusta el ancho según sea necesario */
+}

@@ -40,7 +40,7 @@ def calculate_prices():
 
     return df
 
-def calculate_graphs():
+def calculate_graphs(path):
     months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
     sales = [150, 200, 180, 220, 300, 250, 210, 240, 270, 290, 310, 330]
 
@@ -51,8 +51,7 @@ def calculate_graphs():
     plt.title('Ventas por Mes')
     plt.xticks(rotation=45)
 
-    path = 'static/temp/ventas.png'
-    plt.savefig(path)
+    plt.savefig(f'{path}/ventas.png')
     plt.close()
 
     months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
@@ -68,8 +67,7 @@ def calculate_graphs():
     plt.legend()    
     plt.xticks(rotation=45)
 
-    path = 'static/temp/ventas_gastos.png'
-    plt.savefig(path)
+    plt.savefig(f'{path}/ventas_gastos.png')
     plt.close()
 
 def search_by_name(productos, nombre_producto):
