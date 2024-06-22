@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect, flash, url_for
+from flask import Flask, render_template, request, redirect, flash, url_for, jsonify, make_response
 from flaskwebgui import FlaskUI
-from werkzeug.utils import secure_filename
 import pandas as pd
+import csv
 from PIL import Image
+import pdfkit
 import os
 import sys
 
@@ -14,8 +15,12 @@ def get_base_path():
         return sys._MEIPASS
     return os.path.abspath(".")
 
+wkhtmltopdf_path = os.path.abspath('wkhtmltopdf/bin/wkhtmltopdf.exe')
+print(f'Using wkhtmltopdf executable at: {wkhtmltopdf_path}')
+
+config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
+
 UPLOAD_FOLDER = os.path.join(get_base_path(), 'static/media/products')
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__, static_folder=os.path.join(get_base_path(), 'static'), template_folder=os.path.join(get_base_path(), 'templates'))
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -27,8 +32,26 @@ app.secret_key = 'Aurora Cafe'
 df_products = pd.read_csv('data/recipes.csv', index_col='Unnamed: 0')
 df_ingredients = pd.read_csv('data/ingredients.csv')
 df_expenses = pd.read_csv('data/expenses.csv')
+df_menu = pd.read_csv('data/menu.csv')
+df_settings = pd.read_csv('data/settings.csv')
+
 
 ingredients = df_ingredients['Nombre'].to_list()
+
+def get_description(product_name):
+    description = df_menu.loc[df_menu['Producto'] == product_name, 'Descripcion'].values
+    return description[0] if description else ""
+
+
+def set_description(product_name, description):
+    global df_menu
+
+    if product_name in df_menu['Producto'].values:
+        df_menu.loc[df_menu['Producto'] == product_name, 'Descripcion'] = description
+    else:
+        new_row = pd.DataFrame({'Producto': [product_name], 'Descripcion': [description]})
+        df_menu = pd.concat([df_menu, new_row], ignore_index=True)
+    df_menu.to_csv('data/menu.csv', index=False)
 
 
 def get_recipe(product_name):
@@ -60,15 +83,18 @@ def index():
 
 @app.route('/product/<product_name>')
 def product(product_name):
-    global df_products
+    global df_products, df_menu
     df_products = pd.read_csv('data/recipes.csv', index_col='Unnamed: 0')
+    df_menu = pd.read_csv('data/menu.csv')
     ingredients = get_recipe(product_name)
+    description = get_description(product_name)
     
     df_calculation = calculate_prices()
     products = df_calculation.to_dict(orient='records')
     product = search_by_name(products, product_name)
     
-    return render_template('product.html', product=product, ingredients=ingredients)
+    return render_template('product.html', product=product, ingredients=ingredients, description=description)
+
 
 
 @app.route('/add_product', methods=['POST'])
@@ -82,14 +108,30 @@ def add_product():
                 if product_image.filename != '':
                     if allowed_file(product_image.filename):
                         # Convertir PNG a JPG si es necesario
+                        img = Image.open(product_image)
                         if product_image.filename.lower().endswith('.png'):
-                            img = Image.open(product_image)
-                            rgb_img = img.convert('RGB')
-                            product_image = rgb_img
+                            img = img.convert('RGB')
+
+                        # Asegurarse de que la imagen tenga una relación de aspecto 2:1
+                        width, height = img.size
+                        aspect_ratio = width / height
+                        if aspect_ratio > 2:
+                            # Recortar el ancho
+                            new_width = height * 2
+                            left = (width - new_width) / 2
+                            img = img.crop((left, 0, left + new_width, height))
+                        elif aspect_ratio < 2:
+                            # Recortar el alto
+                            new_height = width / 2
+                            top = (height - new_height) / 2
+                            img = img.crop((0, top, width, top + new_height))
+
+                        # Redimensionar la imagen a un tamaño específico si es necesario
+                        img = img.resize((500, 250), Image.LANCZOS)  # Ajusta este tamaño según tus necesidades
 
                         # Crear un nombre de archivo seguro usando el nombre del producto y la extensión jpg
-                        filename = secure_filename(product_name + '.jpg')
-                        product_image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                        filename = product_name + '.jpg'
+                        img.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                     else:
                         flash('Formato de imagen no válido. Use solamente: jpg, jpeg')
                         return redirect(url_for('index'))
@@ -103,9 +145,6 @@ def add_product():
         flash('Ingrese un nombre válido para el producto')
 
     return redirect(url_for('index'))
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route('/delete_product/<product_name>', methods=['GET', 'POST'])
@@ -129,8 +168,9 @@ def delete_product(product_name):
     # Si es un GET, mostrar confirmación de eliminación
     return render_template('confirm_delete_product.html', product_name=product_name)
 
+
 def delete_product_image(product_name):
-    filename = secure_filename(product_name + '.jpg')
+    filename = product_name + '.jpg'
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     if os.path.exists(filepath):
         os.remove(filepath)
@@ -141,9 +181,10 @@ def delete_product_image(product_name):
 
 @app.route('/update_product', methods=['POST'])
 def update_product():
-    global df_products
+    global df_products, df_menu
     product_name = request.form['product_name']
     new_product_name = request.form['new_product_name']
+    description = request.form['description']
     ingredients = request.form.getlist('ingredients[]')
     quantities = request.form.getlist('quantities[]')
 
@@ -166,24 +207,65 @@ def update_product():
         if ingredient not in new_recipe:
             df_products.at[ingredient, new_product_name] = None
 
-    # Guardar el DataFrame actualizado de vuelta al archivo CSV
+    # Guardar el DataFrame actualizado en el archivo CSV
     df_products.to_csv('data/recipes.csv')
+    
+    # Guardar la descripción en el archivo CSV
+    set_description(new_product_name, description)
 
-    flash('Producto actualizado exitosamente')
+    flash(f'Producto "{new_product_name}" actualizado con éxito.')
     return redirect(url_for('product', product_name=new_product_name))
 
-def rename_product_image(old_product_name, new_product_name):
-    old_filename = secure_filename(old_product_name + '.jpg')
-    new_filename = secure_filename(new_product_name + '.jpg')
 
-    old_filepath = os.path.join(app.config['UPLOAD_FOLDER'], old_filename)
-    new_filepath = os.path.join(app.config['UPLOAD_FOLDER'], new_filename)
+@app.route('/upload_product_image', methods=['POST'])
+def upload_product_image():
+    if 'product_image' not in request.files:
+        return jsonify({'success': False, 'message': 'No se subió ningún archivo'})
 
-    if os.path.exists(old_filepath):
-        os.rename(old_filepath, new_filepath)
-        flash(f'Imagen del producto "{old_product_name}" renombrada a "{new_product_name}" correctamente')
-    else:
-        flash(f'La imagen del producto "{old_product_name}" no existe')
+    file = request.files['product_image']
+    if file and allowed_file(file.filename):
+        product_name = request.form['product_name']
+
+        img = Image.open(file)
+        if file.filename.lower().endswith('.png'):
+            img = img.convert('RGB')
+
+        # Asegurarse de que la imagen tenga una relación de aspecto 2:1
+        width, height = img.size
+        aspect_ratio = width / height
+        if aspect_ratio > 2:
+            # Recortar el ancho
+            new_width = height * 2
+            left = (width - new_width) / 2
+            img = img.crop((left, 0, left + new_width, height))
+        elif aspect_ratio < 2:
+            # Recortar el alto
+            new_height = width / 2
+            top = (height - new_height) / 2
+            img = img.crop((0, top, width, top + new_height))
+
+        # Redimensionar la imagen a un tamaño específico si es necesario
+        img = img.resize((500, 250), Image.LANCZOS)  # Ajusta este tamaño según tus necesidades
+
+        filename = product_name + '.jpg'
+        img.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        new_image_url = url_for('static', filename=f'media/products/{filename}')
+        return jsonify({'success': True, 'new_image_url': new_image_url})
+
+    return jsonify({'success': False, 'message': 'Formato de archivo no permitido. Por favor, sube una imagen JPG o PNG.'})
+
+
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def rename_product_image(old_name, new_name):
+    old_path = f'static/media/products/{old_name}.jpg'
+    new_path = f'static/media/products/{new_name}.jpg'
+    if os.path.exists(old_path):
+        os.rename(old_path, new_path)
 
 
 @app.route('/ingredients')
@@ -197,20 +279,20 @@ def update_prices():
     global df_ingredients
 
     nombres = request.form.getlist('nombres[]')
+    cantidades = request.form.getlist('cantidades[]')
     precios = request.form.getlist('precios[]')
-    unidades = request.form.getlist('unidades[]')
 
     # Crear un nuevo DataFrame para los ingredientes actualizados
     new_data = {
         'Nombre': nombres,
-        'Precio': [float(precio) for precio in precios],
-        'Unidad': unidades
+        'Cantidad': [float(cantidad) for cantidad in cantidades],
+        'Precio': [float(precio) for precio in precios]
     }
     df_ingredients = pd.DataFrame(new_data)
 
     # Guardar el DataFrame actualizado en el archivo CSV
     df_ingredients.to_csv('data/ingredients.csv', index=False)
-    flash('Precios y unidades actualizados')
+    flash('Precios y cantidades actualizados')
     return redirect(url_for('ingredients_form'))
 
 
@@ -256,13 +338,52 @@ def summary():
     return render_template('summary.html')
 
 
-@app.route('/settings')
-def settings():
-    '''
-    Settings page.
-    '''
-    return render_template('settings.html')
+def read_csv(file_path):
+    products = []
+    with open(file_path, newline='', encoding='latin1') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            products.append(row)
+    return products
 
+
+@app.route('/menu')
+def menu():
+    products = read_csv('data/menu.csv')
+    return render_template('menu.html', products=products)
+
+
+@app.route('/export_pdf')
+def export_pdf():
+    products = read_csv('data/menu.csv')
+    rendered = render_template('menu_pdf.html', products=products)
+
+    pdf = pdfkit.from_string(rendered,
+                            False,
+                            configuration=config,
+                            options={'no-stop-slow-scripts': '', 'enable-local-file-access': ''})
+
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=menu.pdf'
+    return response
+
+
+@app.route('/settings')
+def settings_form():
+    ganancia = df_settings.loc[df_settings['setting'] == 'ganancia', 'value'].values[0]
+    return render_template('settings.html', ganancia=ganancia)
+
+@app.route('/update_settings', methods=['POST'])
+def update_settings():
+    global df_settings
+
+    ganancia = request.form['ganancia']
+    df_settings.loc[df_settings['setting'] == 'ganancia', 'value'] = ganancia
+    df_settings.to_csv('data/settings.csv', index=False)
+    
+    flash('Cambios Aplicados')
+    return redirect(url_for('settings_form'))
 
 if __name__ == "__main__":
     check_for_updates()

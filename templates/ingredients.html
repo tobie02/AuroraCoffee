@@ -2,36 +2,37 @@
 
 {% block body %}
 <div class="container mt-4">
-    <h1>Ingredientes</h1>
     <form method="post" action="{{ url_for('update_prices') }}">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1>Ingredientes</h1>
+        <button type="submit" class="btn btn-primary mt-3">Aplicar</button>
+    </div>
+    <br>
         <ul class="list-group" id="ingredients-list">
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
-                    <h3>Ingrediente</h3>
+                    <h3>Nombre</h3>
                 </div>
                 <div>
-                    <h3>Precio/Unidad</h3>
+                    <h3 class="d-inline-block">Cantidad</h3> <span>(g/ml/uni)</span>
+                </div>
+                <div>
+                    <h3>Precio</h3>
                 </div>
                 <div></div>
             </li>
             {% for item in ingredients %}
             <li class="list-group-item d-flex justify-content-between align-items-center" id="ingredient-{{ loop.index }}">
-                <div class="ingredient-name flex-grow-1">
+                <div class="ingredient-name form-group mb-2">
                     <input type="text" class="form-control" name="nombres[]" value="{{ item.Nombre }}" required>
                 </div>
-                <div class="d-flex align-items-center">
-                    <div class="form-group mb-2 mr-2">
-                        <label for="precio-{{ loop.index }}" class="sr-only">Precio</label>
-                        <input type="number" step="0.01" class="form-control" id="precio-{{ loop.index }}" name="precios[]" placeholder="Precio" value="{{ item.Precio }}" required>
-                    </div>
-                    <div class="form-group mb-2">
-                        <label for="unidad-{{ loop.index }}" class="sr-only">Unidad</label>
-                        <select class="form-control" id="unidad-{{ loop.index }}" name="unidades[]" required>
-                            <option value="kilogramo" {% if item.Unidad == 'kilogramo' %} selected {% endif %}>Kilogramo</option>
-                            <option value="litro" {% if item.Unidad == 'litro' %} selected {% endif %}>Litro</option>
-                            <option value="unidad" {% if item.Unidad == 'unidad' %} selected {% endif %}>Unidad</option>
-                        </select>
-                    </div>
+                <div class="form-group mb-2 mr-2">
+                    <label for="cantidad-{{ loop.index }}" class="sr-only">Cantidad</label>
+                    <input type="number" step="0.01" class="form-control" id="cantidad-{{ loop.index }}" name="cantidades[]" placeholder="Cantidad" value="{{ item.Cantidad }}" required>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="precio-{{ loop.index }}" class="sr-only">Precio</label>
+                    <input type="number" step="0.01" class="form-control" id="precio-{{ loop.index }}" name="precios[]" placeholder="Precio" value="{{ item.Precio }}" required>
                 </div>
                 <button type="button" class="btn btn-danger btn-sm remove-ingredient-btn" data-index="{{ loop.index }}">Eliminar</button>
             </li>
@@ -40,10 +41,6 @@
         <div class="d-flex justify-content-center mt-3">
             <button type="button" class="btn btn-success mt-3" id="add-ingredient-btn">Agregar</button>
         </div>
-        <div class="d-flex justify-content-center mt-3">
-            <button type="submit" class="btn btn-primary mt-3">Guardar</button>
-        </div>
-        
     </form>
 </div>
 
@@ -56,34 +53,40 @@ document.getElementById('add-ingredient-btn').addEventListener('click', function
     newIngredient.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
     newIngredient.setAttribute('id', 'ingredient-' + newIndex);
 
+    var nameDiv = document.createElement('div');
+    nameDiv.classList.add('ingredient-name', 'form-group', 'mb-2');
     var nameInput = document.createElement('input');
     nameInput.setAttribute('type', 'text');
-    nameInput.classList.add('form-control', 'ingredient-name-input');  // Agregar una clase específica
+    nameInput.classList.add('form-control', 'ingredient-name-input');
     nameInput.setAttribute('name', 'nombres[]');
-    nameInput.setAttribute('placeholder', 'Nombre del ingrediente');  // Placeholder opcional
+    nameInput.setAttribute('placeholder', 'Nombre del ingrediente');
     nameInput.required = true;
-    newIngredient.appendChild(nameInput);
+    nameDiv.appendChild(nameInput);
+    newIngredient.appendChild(nameDiv);
 
+    var quantityInputGroup = document.createElement('div');
+    quantityInputGroup.classList.add('form-group', 'mb-2', 'mr-2');
+    var quantityInput = document.createElement('input');
+    quantityInput.setAttribute('type', 'number');
+    quantityInput.setAttribute('step', '0.01');
+    quantityInput.classList.add('form-control', 'ingredient-quantity-input');
+    quantityInput.setAttribute('name', 'cantidades[]');
+    quantityInput.setAttribute('placeholder', 'Cantidad');
+    quantityInput.required = true;
+    quantityInputGroup.appendChild(quantityInput);
+    newIngredient.appendChild(quantityInputGroup);
+
+    var priceInputGroup = document.createElement('div');
+    priceInputGroup.classList.add('form-group', 'mb-2');
     var priceInput = document.createElement('input');
     priceInput.setAttribute('type', 'number');
     priceInput.setAttribute('step', '0.01');
-    priceInput.classList.add('form-control', 'ingredient-price-input');  // Agregar una clase específica
+    priceInput.classList.add('form-control', 'ingredient-price-input');
     priceInput.setAttribute('name', 'precios[]');
     priceInput.setAttribute('placeholder', 'Precio');
     priceInput.required = true;
-    newIngredient.appendChild(priceInput);
-
-    var unitSelect = document.createElement('select');
-    unitSelect.classList.add('form-control', 'ingredient-unit-select');  // Agregar una clase específica
-    unitSelect.setAttribute('name', 'unidades[]');
-    unitSelect.required = true;
-    var optionKilogramo = new Option('Kilogramo', 'kilogramo');
-    var optionLitro = new Option('Litro', 'litro');
-    var optionUnidad = new Option('Unidad', 'unidad');
-    unitSelect.add(optionKilogramo);
-    unitSelect.add(optionLitro);
-    unitSelect.add(optionUnidad);
-    newIngredient.appendChild(unitSelect);
+    priceInputGroup.appendChild(priceInput);
+    newIngredient.appendChild(priceInputGroup);
 
     var removeButton = document.createElement('button');
     removeButton.setAttribute('type', 'button');

@@ -2,8 +2,12 @@
 
 {% block body %}
 <div class="container mt-4">
-    <h1>Expensas</h1>
     <form method="post" action="{{ url_for('update_expenses') }}">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Expensas</h1>
+            <button type="submit" class="btn btn-primary mt-3">Aplicar</button>
+        </div>
+        <br>
         <ul class="list-group" id="expenses-list">
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
@@ -16,7 +20,7 @@
             </li>
             {% for item in expenses %}
             <li class="list-group-item d-flex justify-content-between align-items-center" id="expense-{{ loop.index }}">
-                <div class="expense-type flex-grow-1">
+                <div class="expense-type form-group mb-2 flex-grow-1">
                     <input type="text" class="form-control" name="tipos[]" value="{{ item.expensa }}" required>
                 </div>
                 <div class="d-flex align-items-center">
@@ -35,9 +39,6 @@
         <div class="d-flex justify-content-center mt-3">
             <button type="button" class="btn btn-success mt-3" id="add-expense-btn">Agregar</button>
         </div>
-        <div class="d-flex justify-content-center mt-3">
-            <button type="submit" class="btn btn-primary mt-3">Guardar</button>
-        </div>
         
     </form>
 </div>
@@ -51,14 +52,21 @@ document.getElementById('add-expense-btn').addEventListener('click', function() 
     newExpense.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
     newExpense.setAttribute('id', 'expense-' + newIndex);
 
+    var typeDiv = document.createElement('div');
+    typeDiv.classList.add('expense-type', 'form-group', 'mb-2', 'flex-grow-1');
     var typeInput = document.createElement('input');
     typeInput.setAttribute('type', 'text');
     typeInput.classList.add('form-control', 'expense-type-input');  // Agregar una clase específica
     typeInput.setAttribute('name', 'tipos[]');
     typeInput.setAttribute('placeholder', 'Tipo de gasto');  // Placeholder opcional
     typeInput.required = true;
-    newExpense.appendChild(typeInput);
+    typeDiv.appendChild(typeInput);
+    newExpense.appendChild(typeDiv);
 
+    var amountDiv = document.createElement('div');
+    amountDiv.classList.add('d-flex', 'align-items-center');
+    var amountInputGroup = document.createElement('div');
+    amountInputGroup.classList.add('form-group', 'mb-2', 'mr-2');
     var amountInput = document.createElement('input');
     amountInput.setAttribute('type', 'number');
     amountInput.setAttribute('step', '0.01');
@@ -66,7 +74,9 @@ document.getElementById('add-expense-btn').addEventListener('click', function() 
     amountInput.setAttribute('name', 'montos[]');
     amountInput.setAttribute('placeholder', 'Monto');
     amountInput.required = true;
-    newExpense.appendChild(amountInput);
+    amountInputGroup.appendChild(amountInput);
+    amountDiv.appendChild(amountInputGroup);
+    newExpense.appendChild(amountDiv);
 
     var removeButton = document.createElement('button');
     removeButton.setAttribute('type', 'button');

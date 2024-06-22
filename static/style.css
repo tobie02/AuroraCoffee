@@ -130,6 +130,12 @@ style {
     padding: .375rem .75rem; /* Añade un poco de espacio interno */
 }
 
+.description {
+    font-weight: bold; /* Peso de fuente negrita */
+    border: none; /* Elimina el borde del input */
+    padding: .375rem .75rem; /* Añade un poco de espacio interno */
+}
+
 #add-product-btn {
     font-size: 2rem;
     height: 100px; /* Ajusta la altura según sea necesario */

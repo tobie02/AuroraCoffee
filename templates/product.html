@@ -2,15 +2,20 @@
 
 {% block body %}
 <div class="container">
-    <form action="{{ url_for('update_product') }}" method="post">
+    <form action="{{ url_for('update_product') }}" method="post" enctype="multipart/form-data">
         <div class="row mt-5">
             <div class="col-md-11">
-                <div class="input-group input-group-sm mb-1">
-                    <img class="border" src="/static/media/products/{{ product['Producto'] }}.jpg" height="65" style="align-content: center;">
-                    <input name="new_product_name" id="new_product_name" value="{{ product['Producto'] }}" class="h1-like">
+                <div class="d-flex align-items-center mb-1">
+                    <img id="product-image" class="border" src="/static/media/products/{{ product['Producto'] }}.jpg" height="65" style="cursor: pointer;">
+                    <input type="file" id="image-input" name="product_image" accept="image/*" style="display: none;">
+                    <input name="new_product_name" id="new_product_name" value="{{ product['Producto'] }}" class="form-control h1-like" style="flex: 1; margin-left: 10px;">
                     <input type="hidden" name="product_name" id="product_name" value="{{ product['Producto'] }}">
+                    <button type="submit" class="btn btn-primary ml-3">Aplicar</button>
+                    <a href="{{ url_for('delete_product', product_name=product['Producto']) }}" class="btn btn-danger ml-3">Eliminar</a>
                 </div>
-                <br>
+                <div class="form-group mb-2">
+                    <textarea name="description" id="description" class="form-control description" placeholder="Descripción del producto">{{ description }}</textarea>
+                </div>
                 <div class="form-group mb-2">
                     <label><strong>Precio crudo: ${{ product['Precio crudo'] }}</strong></label>
                     <br>  
@@ -48,13 +53,6 @@
                     <div class="d-flex justify-content-center mt-3">
                         <button type="button" class="btn btn-success mt-3" id="add-ingredient-btn">Agregar</button>
                     </div>
-                    <div class="d-flex justify-content-end mt-3">
-                        <button type="submit" class="btn btn-primary mt-3">Guardar</button>
-                    </div>
-                    <div class="d-flex justify-content-end mt-3">
-                        <!-- Botón para eliminar producto -->
-                        <a href="{{ url_for('delete_product', product_name=product['Producto']) }}" class="btn btn-danger">Eliminar</a>
-                    </div>
                 </div>
             </div>
         </div>
@@ -62,6 +60,34 @@
 </div>
 
 <script>
+document.getElementById('product-image').addEventListener('click', function() {
+    document.getElementById('image-input').click();
+});
+
+document.getElementById('image-input').addEventListener('change', function() {
+    var file = this.files[0];
+    if (file) {
+        var formData = new FormData();
+        formData.append('product_image', file);
+        formData.append('product_name', document.getElementById('product_name').value);
+
+        fetch('{{ url_for("upload_product_image") }}', {
+            method: 'POST',
+            body: formData
+        }).then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  document.getElementById('product-image').src = data.new_image_url;
+              } else {
+                  alert('Error al subir la imagen.');
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+          });
+    }
+});
+
 document.getElementById('add-ingredient-btn').addEventListener('click', function() {
     var ingredientsList = document.getElementById('list-group');
     var newIndex = ingredientsList.children.length - 1;  // Adjust for header row
@@ -70,34 +96,44 @@ document.getElementById('add-ingredient-btn').addEventListener('click', function
     newIngredient.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
     newIngredient.setAttribute('id', 'ingredient_' + newIndex);
 
+    var nameDiv = document.createElement('div');
+    nameDiv.classList.add('d-flex', 'align-items-center');
     var nameInput = document.createElement('input');
     nameInput.setAttribute('type', 'text');
     nameInput.setAttribute('class', 'form-control ingredient-name');
     nameInput.setAttribute('id', 'ingredient_' + newIndex + '_ingredient');
     nameInput.setAttribute('name', 'ingredients[]');
     nameInput.setAttribute('required', true);
-    newIngredient.appendChild(nameInput);
+    nameDiv.appendChild(nameInput);
 
+    var quantityDiv = document.createElement('div');
+    quantityDiv.classList.add('d-flex', 'align-items-center');
     var quantityInput = document.createElement('input');
     quantityInput.setAttribute('type', 'number');
     quantityInput.setAttribute('class', 'form-control quantity-input');
     quantityInput.setAttribute('id', 'ingredient_' + newIndex + '_quantity');
     quantityInput.setAttribute('name', 'quantities[]');
     quantityInput.setAttribute('required', true);
-    newIngredient.appendChild(quantityInput);
+    quantityDiv.appendChild(quantityInput);
 
     var quantityLabel = document.createElement('label');
     quantityLabel.setAttribute('for', 'ingredient_' + newIndex + '_quantity');
     quantityLabel.classList.add('quantity-label');
     quantityLabel.textContent = '(g/ml/cant)';
-    newIngredient.appendChild(quantityLabel);
+    quantityDiv.appendChild(quantityLabel);
 
+    var removeDiv = document.createElement('div');
+    removeDiv.classList.add('d-flex', 'align-items-center');
     var removeButton = document.createElement('button');
     removeButton.setAttribute('type', 'button');
     removeButton.classList.add('btn', 'btn-danger', 'btn-sm', 'remove-ingredient-btn');
     removeButton.setAttribute('data-index', newIndex);
     removeButton.textContent = 'Eliminar';
-    newIngredient.appendChild(removeButton);
+    removeDiv.appendChild(removeButton);
+
+    newIngredient.appendChild(nameDiv);
+    newIngredient.appendChild(quantityDiv);
+    newIngredient.appendChild(removeDiv);
 
     ingredientsList.appendChild(newIngredient);
 

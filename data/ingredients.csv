@@ -1,15 +1,18 @@
-Nombre,Precio,Unidad
-Cafe,10000.0,kilogramo
-Harina,870.0,kilogramo
-Azucar,800.0,kilogramo
-Huevo,200.0,unidad
-Leche,1285.0,litro
-Manteca,10000.0,kilogramo
-Aceite,1800.0,litro
-Cacao,5000.0,kilogramo
-Polvo de hornear,10000.0,kilogramo
-Limon,1000.0,kilogramo
-Dulce de Leche,5000.0,kilogramo
-Frutilla,2000.0,kilogramo
-Chocolate,2000.0,kilogramo
-Oreo,3000.0,kilogramo
+Nombre,Cantidad,Precio
+Cafe,1000.0,10000.0
+Harina,1000.0,870.0
+Azucar,1000.0,800.0
+Huevo,1.0,200.0
+Leche,1000.0,1285.0
+Manteca,250.0,2500.0
+Aceite,1500.0,2000.0
+Cacao,1000.0,5000.0
+Polvo de hornear,1000.0,10000.0
+Limon,1000.0,1000.0
+Dulce de Leche,1000.0,5000.0
+Frutilla,1000.0,5000.0
+Chocolate,500.0,3000.0
+Oreo,500.0,3000.0
+Mono,1.0,15000.0
+Perro,1.0,5000.0
+Anteojos,1.0,1200.0
