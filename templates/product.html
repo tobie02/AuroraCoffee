@@ -5,18 +5,18 @@
     <form action="{{ url_for('update_product') }}" method="post" enctype="multipart/form-data">
         <div class="row mt-5">
             <div class="col-md-11">
-                <div class="d-flex align-items-center mb-1">
+                <div class="d-flex align-items-center mb-1 {{ 'dark' if mode == 'dark' else '' }}">
                     <img id="product-image" class="border" src="/static/media/products/{{ product['Producto'] }}.jpg" height="65" style="cursor: pointer;">
                     <input type="file" id="image-input" name="product_image" accept="image/*" style="display: none;">
-                    <input name="new_product_name" id="new_product_name" value="{{ product['Producto'] }}" class="form-control h1-like" style="flex: 1; margin-left: 10px;">
+                    <input name="new_product_name" id="new_product_name" value="{{ product['Producto'] }}" class="form-control h1-like {{ 'dark' if mode == 'dark' else '' }}" style="flex: 1; margin-left: 10px;">
                     <input type="hidden" name="product_name" id="product_name" value="{{ product['Producto'] }}">
-                    <button type="submit" class="btn btn-primary ml-3">Aplicar</button>
+                    <button type="submit" class="btn btn-primary ml-3">Guardar</button>
                     <a href="{{ url_for('delete_product', product_name=product['Producto']) }}" class="btn btn-danger ml-3">Eliminar</a>
                 </div>
-                <div class="form-group mb-2">
-                    <textarea name="description" id="description" class="form-control description" placeholder="Descripción del producto">{{ description }}</textarea>
+                <div class="form-group mb-2 {{ 'dark' if mode == 'dark' else '' }}">
+                    <textarea name="description" id="description" class="form-control description {{ 'dark' if mode == 'dark' else '' }}" placeholder="Descripción del producto">{{ description }}</textarea>
                 </div>
-                <div class="form-group mb-2">
+                <div class="form-group mb-2 {{ 'dark' if mode == 'dark' else '' }}">
                     <label><strong>Precio crudo: ${{ product['Precio crudo'] }}</strong></label>
                     <br>  
                     <label><strong>Precio final: ${{ product['Precio final'] }}</strong></label>                  
@@ -24,25 +24,24 @@
                 <br>
                 <div>
                     <ul id="list-group">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div class="d-flex align-items-center">
+                        <li class="list-group-item d-flex justify-content-between align-items-center {{ 'dark' if mode == 'dark' else '' }}">
+                            <div>
                                 <h3>Ingrediente</h3>
                             </div>
-                            <div class="d-flex align-items-center">
-                                <h3>Cantidad</h3>
+                            <div>
+                                <h3 class="d-inline-block">Cantidad</h3> <span>(g/ml/uni)</span>
                             </div>
-                            <div class="d-flex align-items-center">
+                            <div>
                                 <h3></h3>
                             </div>
                         </li>
                         {% for ingredient, quantity in ingredients.items() %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center" id="ingredient_{{ loop.index0 }}">
+                        <li class="list-group-item d-flex justify-content-between align-items-center {{ 'dark' if mode == 'dark' else '' }}" id="ingredient_{{ loop.index0 }}">
                             <div class="d-flex align-items-center">
-                                <input type="text" class="form-control ingredient-name" id="ingredient_{{ loop.index0 }}_ingredient" name="ingredients[]" value="{{ ingredient }}" required>
+                                <input type="text" class="form-control ingredient-name {{ 'dark-input' if mode == 'dark' else '' }}" id="ingredient_{{ loop.index0 }}_ingredient" name="ingredients[]" value="{{ ingredient }}" required>
                             </div>
                             <div class="d-flex align-items-center">
-                                <input type="number" class="form-control quantity-input" id="ingredient_{{ loop.index0 }}_quantity" name="quantities[]" value="{{ quantity }}" required>
-                                <label for="ingredient_{{ loop.index0 }}_quantity" class="quantity-label">(g/ml/cant)</label>
+                                <input type="number" class="form-control quantity-input {{ 'dark-input' if mode == 'dark' else '' }}" id="ingredient_{{ loop.index0 }}_quantity" name="quantities[]" value="{{ quantity }}" required>
                             </div>
                             <div class="d-flex align-items-center">
                                 <button type="button" class="btn btn-danger btn-sm remove-ingredient-btn" data-index="{{ loop.index0 }}">Eliminar</button>
@@ -95,13 +94,21 @@ document.getElementById('add-ingredient-btn').addEventListener('click', function
     var newIngredient = document.createElement('li');
     newIngredient.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
     newIngredient.setAttribute('id', 'ingredient_' + newIndex);
+    // Check current mode and apply 'dark' class if necessary
+    if (document.body.classList.contains('dark')) {
+        newIngredient.classList.add('dark');
+    }
 
     var nameDiv = document.createElement('div');
     nameDiv.classList.add('d-flex', 'align-items-center');
     var nameInput = document.createElement('input');
     nameInput.setAttribute('type', 'text');
     nameInput.setAttribute('class', 'form-control ingredient-name');
+    if (document.body.classList.contains('dark')) {
+        nameInput.classList.add('dark-input');
+    }
     nameInput.setAttribute('id', 'ingredient_' + newIndex + '_ingredient');
+    nameInput.setAttribute('placeholder', 'Ingrediente');  // Placeholder opcional
     nameInput.setAttribute('name', 'ingredients[]');
     nameInput.setAttribute('required', true);
     nameDiv.appendChild(nameInput);
@@ -111,16 +118,14 @@ document.getElementById('add-ingredient-btn').addEventListener('click', function
     var quantityInput = document.createElement('input');
     quantityInput.setAttribute('type', 'number');
     quantityInput.setAttribute('class', 'form-control quantity-input');
+    if (document.body.classList.contains('dark')) {
+        quantityInput.classList.add('dark-input');
+    }
     quantityInput.setAttribute('id', 'ingredient_' + newIndex + '_quantity');
+    quantityInput.setAttribute('placeholder', 'Cantidad (g/ml/uni)');  // Placeholder opcional
     quantityInput.setAttribute('name', 'quantities[]');
     quantityInput.setAttribute('required', true);
     quantityDiv.appendChild(quantityInput);
-
-    var quantityLabel = document.createElement('label');
-    quantityLabel.setAttribute('for', 'ingredient_' + newIndex + '_quantity');
-    quantityLabel.classList.add('quantity-label');
-    quantityLabel.textContent = '(g/ml/cant)';
-    quantityDiv.appendChild(quantityLabel);
 
     var removeDiv = document.createElement('div');
     removeDiv.classList.add('d-flex', 'align-items-center');

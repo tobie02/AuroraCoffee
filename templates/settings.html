@@ -9,12 +9,48 @@
             <button type="submit" class="btn btn-primary mt-3">Aplicar</button>
         </div>
         <br>
+        <div class="d-flex justify-content-between mt-3">
+            <button id="dark-mode-toggle" type="button" class="btn {% if mode == 'dark' %} btn-outline-light {% else %} btn-outline-dark {% endif %} mt-3 ">
+                {% if mode == 'dark' %}
+                    <i class="fas fa-sun"></i> Modo Claro  
+                {% else %}
+                    <i class="fas fa-moon"></i> Modo Oscuro
+                {% endif %}
+            </button>
+        </div>
+        <br>
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="ganancia">Porcentaje de Ganancia (%)</label>
                     <div class="input-group input-group-sm custom-input-width">
-                        <input type="number" step="0.01" class="form-control" id="ganancia" name="ganancia" value="{{ ganancia }}" required>
+                        <input type="number" step="0.01" class="form-control {{ 'dark-input' if mode == 'dark' else '' }}" id="ganancia" name="ganancia" value="{{ ganancia }}" required>
+                        <div class="input-group-append">
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="ganancia">Porcentaje de IVA (%)</label>
+                    <div class="input-group input-group-sm custom-input-width">
+                        <input type="number" step="0.01" class="form-control {{ 'dark-input' if mode == 'dark' else '' }}" id="iva" name="iva" value="{{ iva }}" required>
+                        <div class="input-group-append">
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="ganancia">Porcentaje de Ingresos Brutos (%)</label>
+                    <div class="input-group input-group-sm custom-input-width">
+                        <input type="number" step="0.01" class="form-control {{ 'dark-input' if mode == 'dark' else '' }}" id="ib" name="ib" value="{{ ib }}" required>
                         <div class="input-group-append">
                             <span class="input-group-text">%</span>
                         </div>
@@ -27,7 +63,20 @@
 
 <style>
     .custom-input-width {
-        width: 100px; /* Ajusta este valor según tus necesidades */
+        width: 100px;
     }
 </style>
+
+<script>
+document.getElementById('dark-mode-toggle').addEventListener('click', function() {
+    fetch('{{ url_for('toggle_dark_mode') }}', { method: 'POST' })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+});
+</script>
+
 {% endblock %}

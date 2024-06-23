@@ -1,27 +1,23 @@
 import pandas as pd
+from math import ceil
 import matplotlib.pyplot as plt
 
 def calculate_prices():
     recetas_df = pd.read_csv('data/recipes.csv', index_col=0)
     precios_df = pd.read_csv('data/ingredients.csv')
+    settings = pd.read_csv('data/settings.csv', index_col='setting')
+
 
     precios_df['Nombre'] = precios_df['Nombre'].str.lower()
     recetas_df.index = recetas_df.index.str.lower()
-
-    unidad_to_factor = {
-        'kilogramo': 1000,
-        'litro': 1000,
-        'unidad': 1  # unidad se mantiene igual
-    }
 
     def calcular_costo(row):
         costo_total = 0
         for ingrediente, cantidad in row.items():
             if pd.notna(cantidad) and ingrediente in precios_dict:
                 precio = precios_dict[ingrediente]['Precio']
-                unidad = precios_dict[ingrediente]['Unidad']
-                factor = unidad_to_factor.get(unidad, 1)  # obtener el factor de conversión
-                costo_total += cantidad * precio / factor  # ajustar la cantidad según la unidad
+                cantidad_compra = precios_dict[ingrediente]['Cantidad']
+                costo_total += cantidad * precio / cantidad_compra  # ajustar la cantidad según la unidad
         return costo_total
 
     precios_dict = precios_df.set_index('Nombre').to_dict(orient='index')
@@ -30,15 +26,48 @@ def calculate_prices():
 
     df = pd.DataFrame(costo_recetas.items(), columns=['Producto', 'Precio crudo'])
 
-    df['Precio final'] = df['Precio crudo'] * 1.3
+    ganancia = int(settings.loc['ganancia', 'value'])
+    ganancia = (ganancia / 100) + 1
+    iva = int(settings.loc['iva', 'value'])
+    iva = (iva / 100) + 1
+    ib = int(settings.loc['ib', 'value'])
+    ib = (ib / 100) + 1
+
+
+    df['Precio final'] = df['Precio crudo'] * ganancia
+    df['Precio final'] = df['Precio final'] * iva
+    df['Precio final'] = df['Precio final'] * ib
+
+    df['Precio final'] = df['Precio final'].apply(lambda x: ceil(x / 100) * 100)
 
     df['Precio crudo'] = round(df['Precio crudo'], 2)
-    df['Precio final'] = round(df['Precio final'], 2)
 
+    menu_df = pd.read_csv('data/menu.csv')
 
-    df.to_csv('data/calculation.csv', index=False)
+    products = df['Producto'].to_list()
 
-    return df
+    menu_df = menu_df[menu_df['Producto'].isin(products)]
+
+    productos_faltantes = [producto for producto in products if producto not in menu_df['Producto'].values]
+
+    nuevas_filas = []
+    for producto in productos_faltantes:
+        nuevas_filas.append({'Producto': producto, 'Descripcion': '', 'Precio crudo': None, 'Precio final': None})
+    nuevas_filas = pd.DataFrame(nuevas_filas)
+    menu_df = pd.concat([menu_df, nuevas_filas], ignore_index=True)
+    
+
+    for index, row in menu_df.iterrows():
+        producto = row['Producto']
+        if producto in df['Producto'].values:
+            menu_df.loc[index, 'Precio crudo'] = df.loc[df['Producto'] == producto, 'Precio crudo'].values[0]
+            menu_df.loc[index, 'Precio final'] = df.loc[df['Producto'] == producto, 'Precio final'].values[0]
+
+    menu_df['Precio final'] = menu_df['Precio final'].astype(int)
+
+    menu_df.to_csv('data/menu.csv', index=False)
+
+    return menu_df
 
 def calculate_graphs(path):
     months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
@@ -80,5 +109,6 @@ def search_by_name(productos, nombre_producto):
 if __name__ == '__main__':
 
     df_calculation = calculate_prices()
-    products = df_calculation.to_dict(orient='records')
-    print(search_by_name(products, "Cappuccino"))
+    print(df_calculation)
+    # products = df_calculation.to_dict(orient='records')
+    # print(search_by_name(products, "Cappuccino"))

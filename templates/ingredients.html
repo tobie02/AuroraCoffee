@@ -5,11 +5,11 @@
     <form method="post" action="{{ url_for('update_prices') }}">
     <div class="d-flex justify-content-between align-items-center">
         <h1>Ingredientes</h1>
-        <button type="submit" class="btn btn-primary mt-3">Aplicar</button>
+        <button type="submit" class="btn btn-primary mt-3">Guardar</button>
     </div>
     <br>
         <ul class="list-group" id="ingredients-list">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <li class="list-group-item d-flex justify-content-between align-items-center {{ 'dark' if mode == 'dark' else '' }}">
                 <div>
                     <h3>Nombre</h3>
                 </div>
@@ -22,17 +22,17 @@
                 <div></div>
             </li>
             {% for item in ingredients %}
-            <li class="list-group-item d-flex justify-content-between align-items-center" id="ingredient-{{ loop.index }}">
+            <li class="list-group-item d-flex justify-content-between align-items-center {{ 'dark' if mode == 'dark' else '' }}" id="ingredient-{{ loop.index }}">
                 <div class="ingredient-name form-group mb-2">
-                    <input type="text" class="form-control" name="nombres[]" value="{{ item.Nombre }}" required>
+                    <input type="text" class="form-control {{ 'dark-input' if mode == 'dark' else '' }}" name="nombres[]" value="{{ item.Nombre }}" required>
                 </div>
                 <div class="form-group mb-2 mr-2">
                     <label for="cantidad-{{ loop.index }}" class="sr-only">Cantidad</label>
-                    <input type="number" step="0.01" class="form-control" id="cantidad-{{ loop.index }}" name="cantidades[]" placeholder="Cantidad" value="{{ item.Cantidad }}" required>
+                    <input type="number" step="0.01" class="form-control {{ 'dark-input' if mode == 'dark' else '' }}" id="cantidad-{{ loop.index }}" name="cantidades[]" placeholder="Cantidad" value="{{ item.Cantidad }}" required>
                 </div>
                 <div class="form-group mb-2">
                     <label for="precio-{{ loop.index }}" class="sr-only">Precio</label>
-                    <input type="number" step="0.01" class="form-control" id="precio-{{ loop.index }}" name="precios[]" placeholder="Precio" value="{{ item.Precio }}" required>
+                    <input type="number" step="0.01" class="form-control {{ 'dark-input' if mode == 'dark' else '' }}" id="precio-{{ loop.index }}" name="precios[]" placeholder="Precio" value="{{ item.Precio }}" required>
                 </div>
                 <button type="button" class="btn btn-danger btn-sm remove-ingredient-btn" data-index="{{ loop.index }}">Eliminar</button>
             </li>
@@ -53,16 +53,25 @@ document.getElementById('add-ingredient-btn').addEventListener('click', function
     newIngredient.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
     newIngredient.setAttribute('id', 'ingredient-' + newIndex);
 
+    // Check current mode and apply 'dark' class if necessary
+    if (document.body.classList.contains('dark')) {
+        newIngredient.classList.add('dark');
+    }
+
     var nameDiv = document.createElement('div');
     nameDiv.classList.add('ingredient-name', 'form-group', 'mb-2');
     var nameInput = document.createElement('input');
     nameInput.setAttribute('type', 'text');
     nameInput.classList.add('form-control', 'ingredient-name-input');
+    if (document.body.classList.contains('dark')) {
+        nameInput.classList.add('dark-input');
+    }
     nameInput.setAttribute('name', 'nombres[]');
-    nameInput.setAttribute('placeholder', 'Nombre del ingrediente');
+    nameInput.setAttribute('placeholder', 'Ingrediente');
     nameInput.required = true;
     nameDiv.appendChild(nameInput);
     newIngredient.appendChild(nameDiv);
+    
 
     var quantityInputGroup = document.createElement('div');
     quantityInputGroup.classList.add('form-group', 'mb-2', 'mr-2');
@@ -70,8 +79,11 @@ document.getElementById('add-ingredient-btn').addEventListener('click', function
     quantityInput.setAttribute('type', 'number');
     quantityInput.setAttribute('step', '0.01');
     quantityInput.classList.add('form-control', 'ingredient-quantity-input');
+    if (document.body.classList.contains('dark')) {
+        quantityInput.classList.add('dark-input');
+    }
     quantityInput.setAttribute('name', 'cantidades[]');
-    quantityInput.setAttribute('placeholder', 'Cantidad');
+    quantityInput.setAttribute('placeholder', 'Cantidad (g/ml/uni)');
     quantityInput.required = true;
     quantityInputGroup.appendChild(quantityInput);
     newIngredient.appendChild(quantityInputGroup);
@@ -82,6 +94,9 @@ document.getElementById('add-ingredient-btn').addEventListener('click', function
     priceInput.setAttribute('type', 'number');
     priceInput.setAttribute('step', '0.01');
     priceInput.classList.add('form-control', 'ingredient-price-input');
+    if (document.body.classList.contains('dark')) {
+        priceInput.classList.add('dark-input');
+    }
     priceInput.setAttribute('name', 'precios[]');
     priceInput.setAttribute('placeholder', 'Precio');
     priceInput.required = true;

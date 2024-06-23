@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash, url_for, jsonify, make_response
+from flask import Flask, render_template, request, redirect, flash, url_for, jsonify, make_response, session
 from flaskwebgui import FlaskUI
 import pandas as pd
 import csv
@@ -27,13 +27,13 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 ui = FlaskUI(app, idle_interval=None)
 
-app.secret_key = 'Aurora Cafe'
+app.secret_key = 'Aurora Coffee'
 
 df_products = pd.read_csv('data/recipes.csv', index_col='Unnamed: 0')
 df_ingredients = pd.read_csv('data/ingredients.csv')
 df_expenses = pd.read_csv('data/expenses.csv')
 df_menu = pd.read_csv('data/menu.csv')
-df_settings = pd.read_csv('data/settings.csv')
+settings_df = pd.read_csv('data/settings.csv', index_col='setting')
 
 
 ingredients = df_ingredients['Nombre'].to_list()
@@ -75,15 +75,20 @@ def index():
     '''
     Main Page.
     '''
+    global mode
+
+    settings = pd.read_csv('data/settings.csv', index_col='setting')
+    mode = settings.loc['mode', 'value']
+
     df_calculation = calculate_prices()
     products = df_calculation.to_dict(orient='records')
 
-    return render_template('index.html', products=products)
+    return render_template('index.html', products=products, mode=mode)
 
 
 @app.route('/product/<product_name>')
 def product(product_name):
-    global df_products, df_menu
+    global df_products, df_menu, mode
     df_products = pd.read_csv('data/recipes.csv', index_col='Unnamed: 0')
     df_menu = pd.read_csv('data/menu.csv')
     ingredients = get_recipe(product_name)
@@ -93,8 +98,7 @@ def product(product_name):
     products = df_calculation.to_dict(orient='records')
     product = search_by_name(products, product_name)
     
-    return render_template('product.html', product=product, ingredients=ingredients, description=description)
-
+    return render_template('product.html', product=product, ingredients=ingredients, description=description, mode=mode)
 
 
 @app.route('/add_product', methods=['POST'])
@@ -149,7 +153,7 @@ def add_product():
 
 @app.route('/delete_product/<product_name>', methods=['GET', 'POST'])
 def delete_product(product_name):
-    global df_products
+    global df_products, mode
 
     if request.method == 'POST':
         # Eliminar el producto del DataFrame y guardar el CSV actualizado
@@ -166,7 +170,7 @@ def delete_product(product_name):
             return redirect(url_for('index'))
 
     # Si es un GET, mostrar confirmación de eliminación
-    return render_template('confirm_delete_product.html', product_name=product_name)
+    return render_template('confirm_delete_product.html', product_name=product_name, mode=mode)
 
 
 def delete_product_image(product_name):
@@ -270,8 +274,10 @@ def rename_product_image(old_name, new_name):
 
 @app.route('/ingredients')
 def ingredients_form():
+    global mode
+
     ingredients = df_ingredients.to_dict(orient='records')
-    return render_template('ingredients.html', ingredients=ingredients)
+    return render_template('ingredients.html', ingredients=ingredients, mode=mode)
 
 
 @app.route('/update_prices', methods=['POST'])
@@ -298,13 +304,14 @@ def update_prices():
 
 @app.route('/expenses')
 def expenses_form():
+    global mode
 
     df_expenses = pd.read_csv('data/expenses.csv')
     expenses = df_expenses.to_dict(orient='records')
 
     total = df_expenses['monto'].sum()
 
-    return render_template('expenses.html', expenses=expenses, total=total)
+    return render_template('expenses.html', expenses=expenses, total=total, mode=mode)
 
 
 @app.route('/update_expenses', methods=['POST'])
@@ -332,10 +339,12 @@ def summary():
     '''
     Summary Page.
     '''
+    global mode
+
     path = os.path.join(get_base_path(), 'static', 'temp')
     print(path)
     calculate_graphs(path)
-    return render_template('summary.html')
+    return render_template('summary.html', mode=mode)
 
 
 def read_csv(file_path):
@@ -349,8 +358,11 @@ def read_csv(file_path):
 
 @app.route('/menu')
 def menu():
+    global mode
+
+    calculate_prices()
     products = read_csv('data/menu.csv')
-    return render_template('menu.html', products=products)
+    return render_template('menu.html', products=products, mode=mode)
 
 
 @app.route('/export_pdf')
@@ -370,20 +382,37 @@ def export_pdf():
 
 
 @app.route('/settings')
-def settings_form():
-    ganancia = df_settings.loc[df_settings['setting'] == 'ganancia', 'value'].values[0]
-    return render_template('settings.html', ganancia=ganancia)
+def settings():
+    global mode
+    settings = pd.read_csv('data/settings.csv', index_col='setting')
+    mode = settings.loc['mode', 'value']
+    ganancia = settings.loc['ganancia', 'value']
+    iva = settings.loc['iva', 'value']
+    ib = settings.loc['ib', 'value']
+    return render_template('settings.html', ganancia=ganancia, iva=iva, ib=ib, mode=mode)
 
 @app.route('/update_settings', methods=['POST'])
 def update_settings():
-    global df_settings
-
     ganancia = request.form['ganancia']
-    df_settings.loc[df_settings['setting'] == 'ganancia', 'value'] = ganancia
-    df_settings.to_csv('data/settings.csv', index=False)
-    
-    flash('Cambios Aplicados')
-    return redirect(url_for('settings_form'))
+    iva = request.form['iva']
+    ib = request.form['ib']
+
+    settings = pd.read_csv('data/settings.csv', index_col='setting')
+    settings.loc['ganancia', 'value'] = ganancia
+    settings.loc['iva', 'value'] = iva
+    settings.loc['ib', 'value'] = ib
+    settings.to_csv('data/settings.csv')
+    return redirect(url_for('settings'))
+
+@app.route('/toggle_dark_mode', methods=['POST'])
+def toggle_dark_mode():
+    settings = pd.read_csv('data/settings.csv', index_col='setting')
+    current_mode = settings.loc['mode', 'value']
+    new_mode = 'dark' if current_mode == 'light' else 'light'
+    settings.loc['mode', 'value'] = new_mode
+    settings.to_csv('data/settings.csv')
+    return jsonify(success=True)
+
 
 if __name__ == "__main__":
     check_for_updates()

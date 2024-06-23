@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -14,18 +14,8 @@
     <title>Aurora Coffee</title>
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 
-    <style>
-      .back-button {
-        font-size: 1.5rem;
-        color: #6c757d;
-        cursor: pointer;
-      }
-      .back-button:hover {
-        color: #343a40;
-      }
-    </style>
-  </head>
-  <body onload="modalLoad()">
+</head>
+<body class="{{ 'dark' if mode == 'dark' else '' }}" onload="modalLoad()">
 
     {% for message in get_flashed_messages() %}
     <!-- Modal -->
@@ -43,9 +33,9 @@
     </div>
     {% endfor %}
 
-    <img src="http://{{ request.host }}/static/media/banner.jpg" class="img-fluid w-100" alt="">
+    <img src="http://{{ request.host }}/static/media/banner.png" class="img-fluid w-100" alt="">
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light navbar-expand">
+    <nav class="navbar navbar-expand-lg {% if mode == 'dark' %}navbar-dark{% else %}navbar-light bg-light{% endif %} navbar-expand">
         <a class="navbar-brand" href="#">
             <img src="http://{{ request.host }}/static/media/coffee.ico" width="20" height="20" alt="">
         </a>
@@ -77,7 +67,7 @@
             </ul>
         </div>
     </nav>
-    <nav class="navbar navbar-expand-lg navbar-light navbar-expand">
+    <nav class="navbar navbar-expand-lg {% if mode == 'dark' %}navbar-dark{% else %}navbar-light{% endif %} navbar-expand">
         <!-- Back Button -->
             <div class="img-fluid w-100">
                 <i class="fas fa-chevron-left back-button" onclick="window.history.back()"></i>
@@ -103,7 +93,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
      <!-- Footer -->
-    <footer class="footer bg-light py-3 mt-5">
+    <footer class="footer {% if mode == 'dark' %}dark-input{% else %}bg-light{% endif %} py-3 mt-5">
         <div class="container text-center">
             <span class="text-muted">Redes Sociales:</span>
             <br>
@@ -118,3 +108,6 @@
 
   </body>
 </html>
+
+
+

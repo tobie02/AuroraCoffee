@@ -1,6 +1,33 @@
-style {
-    background-color: gray;
+/* 
+OBSIDIAN #0B1215
+CHARCOAL GRAY #171717
+*/
+
+.dark {
+    background-color: #171717;
+    color: white;
 }
+
+.dark-input {
+    background-color: #343a40;
+    color: white;
+    border-color: #e6e6dc;
+}
+
+.form-control, .custom-select {
+    font-size: small;
+    height: 35px;
+}
+
+.back-button {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: white;
+  }
+.back-button:hover {
+    color: #343a40;
+}
+
 
 .custom-footer {
     padding: 20px 0; /* Ajusta el padding según tus necesidades */
