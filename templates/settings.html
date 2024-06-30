@@ -60,13 +60,6 @@
         </div>
     </form>
 </div>
-
-<style>
-    .custom-input-width {
-        width: 100px;
-    }
-</style>
-
 <script>
 document.getElementById('dark-mode-toggle').addEventListener('click', function() {
     fetch('{{ url_for('toggle_dark_mode') }}', { method: 'POST' })

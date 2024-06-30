@@ -28,6 +28,9 @@ CHARCOAL GRAY #171717
     color: #343a40;
 }
 
+.custom-input-width {
+    width: 100px;
+}
 
 .custom-footer {
     padding: 20px 0; /* Ajusta el padding según tus necesidades */

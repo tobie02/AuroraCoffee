@@ -64,7 +64,7 @@
             <tbody>
                 {% for product in products %}
                 <tr>
-                    <td>{{ product.Producto }}</td>
+                    <td>{{ product['Producto'] }}</td>
                     <td>{{ product['Descripcion'] }}</td>
                     <td>${{ product['Precio final'] }}</td>
                 </tr>
