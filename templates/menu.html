@@ -11,6 +11,7 @@
             <thead>
                 <tr>
                     <th>Producto</th>
+                    <th>Seccion</th>
                     <th>Descripción</th>
                     <th>Precio</th>
                 </tr>
@@ -18,7 +19,8 @@
             <tbody>
                 {% for product in products %}
                 <tr>
-                    <td>{{ product['Producto']}}</td>
+                    <td>{{ product['Producto'] }}</td>
+                    <td>{{ product['Seccion'] }}</td>
                     <td>{{ product['Descripcion'] }}</td>
                     <td>${{ product['Precio final'] }}</td>
                 </tr>

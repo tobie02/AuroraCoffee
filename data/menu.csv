@@ -1,11 +1,11 @@
-Producto,Descripcion,Precio crudo,Precio final
-Cafe Chico,Un cafe chiquito,1080.0,2200
-Cappuccino,Cafe con cacao y leche,1522.75,3100
-Medialuna,Una medialuna de manteca,80.0,200
-Cookies,Galletitas con chips de chocolate,387.0,800
-Lemon Pie,Torta de Lemon Pie,2478.0,5000
-La Marquese,"Torta de Chocolate, Crema, Dulce de Leche y Frutos Rojos",6300.0,12600
-Cheesecake,Torta de Cheesecake con Frutos Rojos,0.0,0
-Blodi y Manche,Un mono y un perrito tirando facha je,21200.0,42300
-Chocolatada,Leche chocolatada nashe,2142.5,4300
-Cafe + 2 medialunas,Un cafe y dos medialunas de manteca,740.0,1500
+Producto,Seccion,Descripcion,Precio crudo,Precio final
+Cafe Chico,Cafes,Un cafe chiquito,1080.0,2200
+Medialuna,Panes,Una medialuna de manteca,80.0,200
+Cappuccino,Cafes,Cafe con cacao y leche,1522.75,3100
+Cookies,Panes,Galletitas con chips de chocolate,387.0,800
+Lemon Pie,Tortas,Torta de Lemon Pie,2478.0,5000
+La Marquese,Tortas,"Torta de Chocolate, Crema, Dulce de Leche y Frutos Rojos",6300.0,12600
+Cheesecake,Tortas,Torta de Cheesecake con Frutos Rojos,0.0,0
+Chocolatada,Batidos,Leche chocolatada nashe,2142.5,4300
+Cafe + 2 medialunas,Promos,Un café y dos medialunas de manteca,740.0,1500
+Aurora,Promos,,0.0,0

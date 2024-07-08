@@ -7,9 +7,7 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    
 
     <title>Aurora Coffee</title>
     <style>
@@ -25,52 +23,70 @@
             text-align: center;
             color: #333;
         }
-        .table {
-            margin: 20px auto;
-            width: 80%;
-        }
-        .table thead th {
-            background-color: #343a40;
-            color: #fff;
-        }
-        .table tbody tr:nth-child(odd) {
-            background-color: #f2f2f2;
-        }
-        .table tbody tr:nth-child(even) {
-            background-color: #e9ecef;
-        }
         .container {
             padding: 20px;
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+        .section {
+            margin-bottom: 40px;
+        }
+        .section h2 {
+            font-family: 'Georgia', serif;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #343a40;
+        }
+        .menu-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .menu-item h4 {
+            font-family: 'Georgia', serif;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .menu-item .price {
+            font-size: 18px;
+            color: #555;
+        }
+        .menu-item .description {
+            font-size: 16px;
+            color: #666;
+        }
+        .text-center {
+            margin-top: 30px;
+        }
+        .social-icon {
+            display: block;
+            margin-top: 10px;
+            font-size: 20px;
+        }
     </style>
   </head>
-  <body onload="modalLoad()">
-    <img src="http://{{ request.host }}/static/media/banner.png" class="img-fluid w-100" alt="">
-
+  <body>
     <div class="container">
         <h3>Aurora Coffee</h3>
         <h1>Menu</h1>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Descripción</th>
-                    <th>Precio</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for product in products %}
-                <tr>
-                    <td>{{ product['Producto'] }}</td>
-                    <td>{{ product['Descripcion'] }}</td>
-                    <td>${{ product['Precio final'] }}</td>
-                </tr>
+        <div class="row">
+            {% for seccion in secciones %}
+            <div class="col-md-6 section">
+                <h2>{{ seccion }}</h2>
+                {% for product in products if product['Seccion'] == seccion %}
+                <div class="menu-item">
+                    <h4>{{ product['Producto'] }} <span class="price">${{ product['Precio final'] }}</span></h4>
+                    <p class="description">{{ product['Descripcion'] }}</p>
+                </div>
                 {% endfor %}
-            </tbody>
-        </table>
+            </div>
+            {% endfor %}
+        </div>
         <div class="text-center">
             <span class="text-muted">Redes Sociales:</span>
             <br>

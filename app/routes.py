@@ -239,25 +239,31 @@ def setup_routes(app, base_path):
 
     @app.route('/export_pdf')
     def export_pdf():
-
         wkhtmltopdf_path = os.path.abspath('wkhtmltopdf/bin/wkhtmltopdf.exe')
         print(f'Using wkhtmltopdf executable at: {wkhtmltopdf_path}')
         config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
 
         menu = pd.read_csv('data/menu.csv')
         menu.fillna("", inplace=True)
+        secciones = menu['Seccion'].drop_duplicates().to_list()
         menu = menu.to_dict(orient='records')
-        rendered = render_template('menu_pdf.html', products=menu)
+        
+        rendered = render_template('menu_pdf.html', products=menu, secciones=secciones)
 
-        pdf = pdfkit.from_string(rendered,
-                                False,
-                                configuration=config,
-                                options={'no-stop-slow-scripts': '', 'enable-local-file-access': ''})
+        pdf = pdfkit.from_string(
+            rendered,
+            False,
+            configuration=config,
+            options={
+                'no-stop-slow-scripts': '',
+            }
+        )
 
         response = make_response(pdf)
         response.headers['Content-Type'] = 'application/pdf'
         response.headers['Content-Disposition'] = 'attachment; filename=menu.pdf'
         return response
+
 
 
     @app.route('/settings')
